@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_owatrans_zone,access_owatrans_zone,model_owatrans_zone,,1,1,1,1
+
