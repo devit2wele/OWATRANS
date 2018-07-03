@@ -199,19 +199,19 @@ class hr_holidays(models.Model):
 
 
 
-    def send_email(self, subject, email_to, message, cr,uid,ids,context=None):
-        values = {
-            'subject': subject,
-             'body_html': message,
-             'email_to': email_to,
-             'email_from': 'owatrans@owatrans.sn',
-             }
-          #---------------------------------------------------------------
-        mail_obj = self.pool.get('mail.mail') 
-        msg_id = mail_obj.create(cr, uid, values, context=context) 
-        if msg_id: 
-              mail_obj.send(cr, uid, [msg_id], context=context) 
-        return True
+    # def send_email(self, subject, email_to, message, cr,uid,ids,context=None):
+    #     values = {
+    #         'subject': subject,
+    #          'body_html': message,
+    #          'email_to': email_to,
+    #          'email_from': 'owatrans@owatrans.sn',
+    #          }
+    #       #---------------------------------------------------------------
+    #     mail_obj = self.pool.get('mail.mail') 
+    #     msg_id = mail_obj.create(cr, uid, values, context=context) 
+    #     if msg_id: 
+    #           mail_obj.send(cr, uid, [msg_id], context=context) 
+    #     return True
   
     @api.model
     def create(self, values):
