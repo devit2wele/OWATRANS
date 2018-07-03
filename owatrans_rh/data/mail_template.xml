@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+
+<record id="email_template_edi_invoice" model="mail.template">
+     <field name="name">COngés - Send by Email</field>
+     <field name="email_from"></field>
+     <field name="subject">Demande de Congés Validée</field>
+     <field name="email_to">${object.employee_id.work_email}</field>
+     <field name="model_id" ref="owatrans_rh.model_hr_holidays"/>
+     <field name="auto_delete" eval="True"/>
+     <field name="body_html"><![CDATA[
+                 Message you need to deliver
+            ]]></field>
+        </record>
+
+
+    </data>
+</odoo>
