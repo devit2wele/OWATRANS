@@ -26,7 +26,7 @@
     'data': [
         'security/groups.xml',
         'security/ir.model.access.csv',  
-        #'views/templates.xml', 
+        'views/templates.xml', 
         'data/fete_locale.xml', 
         'data/cron.xml',
         'data/mail_template.xml',

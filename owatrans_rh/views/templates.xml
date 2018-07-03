@@ -173,7 +173,7 @@
         </field>
     </record>
 
-    <record id="owatrans_rh_leaves_kanban" model="ir.ui.view">
+    <!-- <record id="owatrans_rh_leaves_kanban" model="ir.ui.view">
             <field name="name">owatrans.rh.leaves.kanban</field>
             <field name="model">hr.employee</field>
             <field name="arch" type="xml">
@@ -214,7 +214,7 @@
                     </templates>
                 </kanban>
             </field>
-        </record>
+        </record> -->
 
     <record id="action_view_leaves_employee_kanban" model="ir.actions.act_window">
         <field name="name">Demande de congés à valider</field>
