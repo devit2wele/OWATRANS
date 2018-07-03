@@ -531,13 +531,13 @@
         action="owatrans_rh.action_view_leaves_employee_kanban" 
         groups="group_sup"
     /> -->
-    <menuitem 
+    <!-- <menuitem 
         name="Mes Congés" 
         id="menu_employee_holidays_kanban" 
         parent="hr.menu_open_view_employee_list_my" 
         action="owatrans_rh.action_view_leaves_employee_kanban" 
     />
-
+ -->
     <menuitem
         name='Tous les employees'
         id='menu_owatrans_rh'
