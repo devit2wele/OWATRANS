@@ -246,84 +246,84 @@ class hr_holidays(models.Model):
                 #raise ValidationError("Vous ne pouvez pas soumettre une demande de %s en moins de %s jours de la date prévue de départ"%(holiday_name, delai_soumission))
                 raise ValidationError("Vous ne pouvez pas soumettre une demande de ce type de congés en moins de %s jours de la date prévue de départ" % (self.holiday_status_id.delai_soumission))
 
-    def holidays_confirm(self, cr, uid, ids, context=None):
-        for record in self.browse(cr, uid, ids, context=context):
-            if record.employee_id and record.employee_id.parent_id:
-                self.message_subscribe_users(cr, uid, [record.id], user_ids=[record.employee_id.parent_id.user_id.id], context=context)
-                if record.employee_id.parent_id.mobile_phone:
-                    self.send_sms(record.employee_id.parent_id.mobile_phone, MESSAGE)
-                    subject = "Demande de congés en attente"
-                    email_to = record.employee_id.parent_id.work_email
-                    print(email_to)
-                self.send_email(subject, email_to, MESSAGE, cr, uid, ids)
-            state = 'validation_sup'
-            if self.pool['res.users'].has_group(cr, record.employee_id.id, 'base.group_hr_manager'):
-                state = 'confirm'
-            if self.pool['res.users'].has_group(cr, record.employee_id.id, 'owatrans_rh.group_dp'):
-                state = 'validation_drh'
-            if self.pool['res.users'].has_group(cr, record.employee_id.id, 'owatrans_rh.group_sg'):
-                state = 'validation_ag'
-        return self.write(cr, uid, ids, {'state': state})  
+    # def holidays_confirm(self, cr, uid, ids, context=None):
+    #     for record in self.browse(cr, uid, ids, context=context):
+    #         if record.employee_id and record.employee_id.parent_id:
+    #             self.message_subscribe_users(cr, uid, [record.id], user_ids=[record.employee_id.parent_id.user_id.id], context=context)
+    #             if record.employee_id.parent_id.mobile_phone:
+    #                 self.send_sms(record.employee_id.parent_id.mobile_phone, MESSAGE)
+    #                 subject = "Demande de congés en attente"
+    #                 email_to = record.employee_id.parent_id.work_email
+    #                 print(email_to)
+    #             self.send_email(subject, email_to, MESSAGE, cr, uid, ids)
+    #         state = 'validation_sup'
+    #         if self.pool['res.users'].has_group(cr, record.employee_id.id, 'base.group_hr_manager'):
+    #             state = 'confirm'
+    #         if self.pool['res.users'].has_group(cr, record.employee_id.id, 'owatrans_rh.group_dp'):
+    #             state = 'validation_drh'
+    #         if self.pool['res.users'].has_group(cr, record.employee_id.id, 'owatrans_rh.group_sg'):
+    #             state = 'validation_ag'
+    #     return self.write(cr, uid, ids, {'state': state})  
 
-    def validation_sup(self, cr, uid, ids, context=None):
-        for record in self.browse(cr, uid, ids, context=context):
-            if record.employee_id and record.employee_id.parent_id and record.employee_id.parent_id.user_id:
-                self.message_subscribe_users(cr, uid, [record.id], user_ids=[record.employee_id.parent_id.user_id.id], context=context)
-            self.send_sms("77645792242", MESSAGE)
-            subject = "Demande de congés en attente"
-            email_to = "sadaga.mbacke@owatrans.sn"
-            self.send_email(subject, email_to, MESSAGE, cr, uid, ids)
-        return self.write(cr, uid, ids, {'state': 'validation_drh'})  
+    # def validation_sup(self, cr, uid, ids, context=None):
+    #     for record in self.browse(cr, uid, ids, context=context):
+    #         if record.employee_id and record.employee_id.parent_id and record.employee_id.parent_id.user_id:
+    #             self.message_subscribe_users(cr, uid, [record.id], user_ids=[record.employee_id.parent_id.user_id.id], context=context)
+    #         self.send_sms("77645792242", MESSAGE)
+    #         subject = "Demande de congés en attente"
+    #         email_to = "sadaga.mbacke@owatrans.sn"
+    #         self.send_email(subject, email_to, MESSAGE, cr, uid, ids)
+    #     return self.write(cr, uid, ids, {'state': 'validation_drh'})  
 
-    def validation_drh(self, cr, uid, ids, context=None):
-        for record in self.browse(cr, uid, ids, context=context):
-            if record.employee_id and record.employee_id.parent_id and record.employee_id.parent_id.user_id:
-                self.message_subscribe_users(cr, uid, [record.id], user_ids=[record.employee_id.parent_id.user_id.id], context=context)
-            self.send_sms("77645792223", MESSAGE)
-            subject = "Demande de congés en attente"
-            email_to = "souleymane.bassoum@owatrans.sn"
-            self.send_email(subject, email_to, MESSAGE, cr, uid, ids)
-        return self.write(cr, uid, ids, {'state': 'confirm'})  
+    # def validation_drh(self, cr, uid, ids, context=None):
+    #     for record in self.browse(cr, uid, ids, context=context):
+    #         if record.employee_id and record.employee_id.parent_id and record.employee_id.parent_id.user_id:
+    #             self.message_subscribe_users(cr, uid, [record.id], user_ids=[record.employee_id.parent_id.user_id.id], context=context)
+    #         self.send_sms("77645792223", MESSAGE)
+    #         subject = "Demande de congés en attente"
+    #         email_to = "souleymane.bassoum@owatrans.sn"
+    #         self.send_email(subject, email_to, MESSAGE, cr, uid, ids)
+    #     return self.write(cr, uid, ids, {'state': 'confirm'})  
 
-    def validation_dga(self, cr, uid, ids, context=None):
-        print 'test 5'
-        for record in self.browse(cr, uid, ids, context=context):
-            if record.employee_id and record.employee_id.parent_id and record.employee_id.parent_id.user_id:
-                self.message_subscribe_users(cr, uid, [record.id], user_ids=[record.employee_id.parent_id.user_id.id], context=context)
-            self.send_sms("77645792222", MESSAGE)
-            subject = "Demande de congés en attente"
-            email_to = "doudou.ka@owatrans.sn"
-            self.send_email(subject, email_to, MESSAGE, cr, uid, ids)
-        return self.write(cr, uid, ids, {'state': 'validate1'})  
+    # def validation_dga(self, cr, uid, ids, context=None):
+    #     print 'test 5'
+    #     for record in self.browse(cr, uid, ids, context=context):
+    #         if record.employee_id and record.employee_id.parent_id and record.employee_id.parent_id.user_id:
+    #             self.message_subscribe_users(cr, uid, [record.id], user_ids=[record.employee_id.parent_id.user_id.id], context=context)
+    #         self.send_sms("77645792222", MESSAGE)
+    #         subject = "Demande de congés en attente"
+    #         email_to = "doudou.ka@owatrans.sn"
+    #         self.send_email(subject, email_to, MESSAGE, cr, uid, ids)
+    #     return self.write(cr, uid, ids, {'state': 'validate1'})  
 
-    def validation_ag(self, cr, uid, ids, context=None):
-        for record in self.browse(cr, uid, ids, context=context):
-            if record.employee_id:
-                employee_ids = []
-                employee_ids.append(record.employee_id.id)
-                employee_leaves = self.pool.get('hr.employee').browse(cr, uid, employee_ids, context=context)
-                leaves =  {'taken_leaves':employee_leaves.taken_leaves, 'max_leaves':employee_leaves.max_leaves, 'remaining_leaves':employee_leaves.remaining_leaves}
-                if record.type =="add":
-                    leaves['max_leaves'] = leaves['max_leaves'] + record.number_of_days
-                    leaves['remaining_leaves'] = leaves['remaining_leaves'] + record.number_of_days
-                if record.type =="remove":
-                    leaves['taken_leaves'] = leaves['taken_leaves'] - record.number_of_days
-                    leaves['remaining_leaves'] = leaves['remaining_leaves'] + record.number_of_days
-                self.pool.get('hr.employee').write(cr, uid, employee_ids, leaves)
-                employee_leaves = self.pool.get('hr.employee').browse(cr, uid, employee_ids, context=context)
+    # def validation_ag(self, cr, uid, ids, context=None):
+    #     for record in self.browse(cr, uid, ids, context=context):
+    #         if record.employee_id:
+    #             employee_ids = []
+    #             employee_ids.append(record.employee_id.id)
+    #             employee_leaves = self.pool.get('hr.employee').browse(cr, uid, employee_ids, context=context)
+    #             leaves =  {'taken_leaves':employee_leaves.taken_leaves, 'max_leaves':employee_leaves.max_leaves, 'remaining_leaves':employee_leaves.remaining_leaves}
+    #             if record.type =="add":
+    #                 leaves['max_leaves'] = leaves['max_leaves'] + record.number_of_days
+    #                 leaves['remaining_leaves'] = leaves['remaining_leaves'] + record.number_of_days
+    #             if record.type =="remove":
+    #                 leaves['taken_leaves'] = leaves['taken_leaves'] - record.number_of_days
+    #                 leaves['remaining_leaves'] = leaves['remaining_leaves'] + record.number_of_days
+    #             self.pool.get('hr.employee').write(cr, uid, employee_ids, leaves)
+    #             employee_leaves = self.pool.get('hr.employee').browse(cr, uid, employee_ids, context=context)
             
-            self.send_sms(record.employee_id.mobile_phone, MESSAGE2)
-            self.send_sms("77645792242", MESSAGE3)
-            self.send_sms(record.employee_id.parent_id.mobile_phone, MESSAGE3)
-            self.send_sms("77645792230", MESSAGE3)
-            self.send_sms("77645792223", MESSAGE3)
-            subject = "Demande de congés validée"
-            email_to = "souleymane.bassoum@owatrans.sn"
-            self.send_email(subject, email_to, MESSAGE3, cr, uid, ids)
-            self.send_email(subject, record.employee_id.parent_id.work_email, MESSAGE3, cr, uid, ids)
-            self.send_email(subject, record.employee_id.work_email, MESSAGE3, cr, uid, ids)
-            self.send_email(subject, "sadaga.mbacke@owatrans.sn", MESSAGE3, cr, uid, ids)
-        return self.holidays_validate(cr, uid, ids, context)  
+    #         self.send_sms(record.employee_id.mobile_phone, MESSAGE2)
+    #         self.send_sms("77645792242", MESSAGE3)
+    #         self.send_sms(record.employee_id.parent_id.mobile_phone, MESSAGE3)
+    #         self.send_sms("77645792230", MESSAGE3)
+    #         self.send_sms("77645792223", MESSAGE3)
+    #         subject = "Demande de congés validée"
+    #         email_to = "souleymane.bassoum@owatrans.sn"
+    #         self.send_email(subject, email_to, MESSAGE3, cr, uid, ids)
+    #         self.send_email(subject, record.employee_id.parent_id.work_email, MESSAGE3, cr, uid, ids)
+    #         self.send_email(subject, record.employee_id.work_email, MESSAGE3, cr, uid, ids)
+    #         self.send_email(subject, "sadaga.mbacke@owatrans.sn", MESSAGE3, cr, uid, ids)
+    #     return self.holidays_validate(cr, uid, ids, context)  
 
     """def send_sms(self, number, message):
            data = {'msisdn': number, 'message' : message, 'app': "script_vote", 'titre': 'OWATRANS-RH'}
@@ -361,15 +361,15 @@ class JourFeriesLocaux(models.Model):
     def validate(self, values): 
         return self.write({'statut': 'confirme'})
 
-    def revolu(self,cr, uid, context = None):
+    def revolu(self):
         confirmed_ids = []
         print ("the job is done dave")
-        cr.execute("select id, date from owatrans_rh_ferie where statut = 'confirme'")
-        jour_ferie_ids = cr.dictfetchall()
+        self._cr.execute("select id, date from owatrans_rh_ferie where statut = 'confirme'")
+        jour_ferie_ids = self._cr.dictfetchall()
         for jour_ferie_id in jour_ferie_ids:
             date_ferie = datetime.strptime(jour_ferie_id['date'], "%Y-%m-%d").date()
             if date_ferie < date.today():
-               cr.execute("UPDATE owatrans_rh_ferie SET statut = 'revolu' where id = %d"%jour_ferie_id['id'])
+               self._cr.execute("UPDATE owatrans_rh_ferie SET statut = 'revolu' where id = %d"%jour_ferie_id['id'])
         return True
 
 
