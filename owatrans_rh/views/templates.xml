@@ -173,7 +173,7 @@
         </field>
     </record>
 
-    <!-- <record id="owatrans_rh_leaves_kanban" model="ir.ui.view">
+    <record id="owatrans_rh_leaves_kanban" model="ir.ui.view">
             <field name="name">owatrans.rh.leaves.kanban</field>
             <field name="model">hr.employee</field>
             <field name="arch" type="xml">
@@ -214,9 +214,9 @@
                     </templates>
                 </kanban>
             </field>
-        </record> -->
+        </record>
 
-    <!-- <record id="action_view_leaves_employee_kanban" model="ir.actions.act_window">
+    <record id="action_view_leaves_employee_kanban" model="ir.actions.act_window">
         <field name="name">Demande de congés à valider</field>
         <field name="res_model">hr.employee</field>
         <field name='view_type'>form</field>
@@ -228,7 +228,7 @@
                 Cliquez pour enregistrer un nouvel employé.
             </p>
         </field>
-    </record> -->
+    </record>
 
     <record id="view_employee_tree_inherit" model="ir.ui.view">
         <field name="name">hr.employee.tree.inherit</field>
@@ -531,13 +531,13 @@
         action="owatrans_rh.action_view_leaves_employee_kanban" 
         groups="group_sup"
     /> -->
-    <!-- <menuitem 
+    <menuitem 
         name="Mes Congés" 
         id="menu_employee_holidays_kanban" 
         parent="hr.menu_open_view_employee_list_my" 
         action="owatrans_rh.action_view_leaves_employee_kanban" 
     />
- -->
+
     <menuitem
         name='Tous les employees'
         id='menu_owatrans_rh'
