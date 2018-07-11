@@ -237,9 +237,9 @@
         <field name="arch" type="xml">
             <xpath expr="//tree/field[@name='message_needaction']" position="after">
                 <button 
-                    name="pointage_arrivee" 
+                    name="pointage_entree" 
                     type="object"
-                    string="Arrivée"
+                    string="Entrée"
                 />
                 <button 
                     name="pointage_sortie_pause" 
