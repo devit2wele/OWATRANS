@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="owatrans_rh.report_presence_document">
+        <t t-call="report.external_layout">
+            <div class="page">
+                <div class="">
+                    <div>
+                        <strong>Date From: </strong><span t-field="o.date_from"/>
+                    </div>
+                    <div>
+                        <strong>Date To: </strong><span t-field="o.date_to"/>
+                    </div>
+                    <div>
+                        <strong>Presence: </strong><span t-esc="int(o.diff_presence*60)"/>
+                    </div>
+                </div>
+                <table class="table table-condensed">
+                    <thead>
+                        <tr>
+                            <th class="text-center"><strong>Type pointage</strong></th>
+                            <th class="text-center"><strong>Heure Pointage</strong></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr t-foreach="o.pointage_manuel_ids" t-as="pointage_manuel">
+                            <td class="text-center">
+                                <span t-field="pointage_manuel.type_pointage"/>
+                            </td>
+                            <td class="text-center">
+                                <span t-field="pointage_manuel.date_heure"/>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div> 
+        </t>
+    </template>
+
+    <template id="report_presence">
+        <t t-call="report.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="owatrans_rh.report_presence_document"/>
+            </t>
+        </t>
+    </template>
+</odoo>
+    

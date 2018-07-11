@@ -43,10 +43,10 @@ class HrEmployee(models.Model):
     color = fields.Integer(String = 'Color Index')
     type_employee = fields.Selection(TYPE_EMPLOYEE, string="Type")
 
-    def pointage_arrivee(self):
+    def pointage_entree(self):
         self.env['pointage.manuel'].create({
             'employee': self.id,
-            'type_pointage': 'arrivee',
+            'type_pointage': 'entree',
             'date_heure': str(datetime.today()),
         })
 
@@ -70,7 +70,6 @@ class HrEmployee(models.Model):
             'type_pointage': 'sortie',
             'date_heure': str(datetime.today()),
         })
-
 
 #Categorie
 class Categorie(models.Model):
@@ -384,6 +383,3 @@ class JourFeriesLocaux(models.Model):
     date = fields.Date(string='Date', required = True)
     statut = fields.Selection([('provisoire', 'Provisoire'), ('confirme', 'Confirmé'), ('revolu', 'Révolu')], readonly = True, default = 'provisoire')
     observation = fields.Char(string  = 'Observation')
-
-
-

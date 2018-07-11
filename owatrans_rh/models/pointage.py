@@ -22,7 +22,7 @@ from odoo import SUPERUSER_ID
 
 
 TYPE_POINTAGE = [
-    ('arrivee', 'Arrivée'),
+    ('entree', 'Entrée'),
     ('sortie_pause', 'Sortie Pause'),
     ('retour_pause', 'Retour Pause'),
     ('sortie', 'Sortie'),
@@ -66,6 +66,7 @@ class PointageManuel(models.Model):
 
 class OwatransPresence(models.Model):
     _name = "owatrans.presence"
+    _inherit = ['mail.thread', 'ir.needaction_mixin']
     _description = "Liste de Presence"
 
     employee = fields.Many2one('hr.employee', string='Employee')
@@ -155,54 +156,71 @@ class OwatransPresence(models.Model):
 
         while date_from <= date_to:
             str_date_from = str(date_from).split(' ')[0]
-            #Heure d'arrivée
-            pointage_arrivee_time = self.env["pointage.manuel"] \
-                                              .search([
-                                                ('employee', '=', employee_id),
-                                                ('date_pointage', '=', str_date_from),
-                                                ('type_pointage', '=', 'arrivee')
-            ], limit=1).heure_pointage
-            #Heure Sortie pause
-            pointage_sortie_pause_time = self.env["pointage.manuel"] \
-                                              .search([
-                                                ('employee', '=', employee_id),
-                                                ('date_pointage', '=', str_date_from),
-                                                ('type_pointage', '=', 'sortie_pause')
-            ], limit=1).heure_pointage
-            #Heure Retour Pause
-            pointage_retour_pause_time = self.env["pointage.manuel"] \
-                                              .search([
-                                                ('employee', '=', employee_id),
-                                                ('date_pointage', '=', str_date_from),
-                                                ('type_pointage', '=', 'retour_pause')
-            ], limit=1).heure_pointage
-            #Heure descente
-            pointage_sortie_time = self.env["pointage.manuel"] \
-                                              .search([
-                                                ('employee', '=', employee_id),
-                                                ('date_pointage', '=', str_date_from),
-                                                ('type_pointage', '=', 'sortie')
-            ], limit=1).heure_pointage
-
-            if pointage_arrivee_time and pointage_sortie_time and pointage_sortie_pause_time and pointage_retour_pause_time:
-                tdelta_arrivee_sortie_pause = datetime.strptime(pointage_sortie_pause_time, FMT) - datetime.strptime(pointage_arrivee_time, FMT)
-                tdelta_retour_pause_sortie = datetime.strptime(pointage_sortie_time, FMT) - datetime.strptime(pointage_retour_pause_time, FMT)
-                tdelta_day_work_time = tdelta_arrivee_sortie_pause + tdelta_retour_pause_sortie
-                working_time += tdelta_day_work_time.total_seconds()/3600.0
-
-            if pointage_arrivee_time and pointage_sortie_time and not pointage_sortie_pause_time:
-                #Heure de pause inclus
-                tdelta = datetime.strptime(pointage_sortie_time, FMT) - datetime.strptime(pointage_arrivee_time, FMT)
-                working_time += tdelta.total_seconds()/3600.0
-
-            if pointage_arrivee_time and pointage_sortie_pause_time and not pointage_retour_pause_time:
-                tdelta = datetime.strptime(pointage_sortie_pause_time, FMT) - datetime.strptime(pointage_arrivee_time, FMT)
-                working_time += tdelta.total_seconds()/3600.0
-
+            entree=[]
+            sortie=[]
+            #ALL pointage
+            pointage_all = self.env["pointage.manuel"] \
+                               .search([
+                                    ('employee', '=', employee_id),
+                                    ('date_pointage', '=', str_date_from),
+            ])
+            if pointage_all:
+                #On regroupe par categorie
+                for pointage in pointage_all:
+                    #type IN
+                    if pointage.type_pointage in ['entree', 'retour_pause']:
+                        entree.append(pointage.heure_pointage)
+                    #type OUT
+                    if pointage.type_pointage in ['sortie', 'sortie_pause']:
+                        sortie.append(pointage.heure_pointage)
+                if entree and sortie:
+                    for index in range(min(len(entree), len(sortie))):
+                        tdelta_day_work_time = datetime.strptime(sortie[index], FMT) - datetime.strptime(entree[index], FMT)
+                        working_time += tdelta_day_work_time.total_seconds()/3600.0
 
             date_from = date_from + relativedelta(days=1)
 
         return working_time
+
+    @api.multi
+    def action_send_presence(self):
+        self.ensure_one()
+        
+        ir_model_data = self.env['ir.model.data']
+        
+        try:
+            template_id = ir_model_data.get_object_reference('owatrans_rh', 'email_template_edi_presence')[1]
+        except ValueError:
+            template_id = False
+        try:
+            compose_form_id = ir_model_data.get_object_reference('mail', 'email_compose_message_wizard_form')[1]
+        except ValueError:
+            compose_form_id = False
+        ctx = dict(self.env.context or {})
+        ctx.update({
+            'default_model': 'owatrans.presence',
+            'default_res_id': self.ids[0],
+            'default_use_template': bool(template_id),
+            'default_template_id': template_id,
+            'default_composition_mode': 'comment',
+        })
+        
+        return {
+            'name': _('Compose Email'),
+            'type': 'ir.actions.act_window',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'mail.compose.message',
+            'views': [(compose_form_id, 'form')],
+            'view_id': compose_form_id,
+            'target': 'new',
+            'context': ctx,
+        }
+
+
+    @api.multi
+    def action_print_presence(self):
+        return self.env['report'].get_action(self, 'owatrans_rh.report_presence')
 
     @api.multi
     def send_mail_working_week(self):
@@ -235,12 +253,12 @@ class OwatransPresence(models.Model):
 
     def get_horaire_employee(self, date, employee_id):
 
-        #Heure d'arrivée
-        pointage_arrivee_time = self.env["pointage.manuel"] \
+        #Heure d'entrée
+        pointage_entree_time = self.env["pointage.manuel"] \
                                     .search([
                                         ('employee', '=', employee_id),
                                         ('date_pointage', '=', date),
-                                        ('type_pointage', '=', 'arrivee')
+                                        ('type_pointage', '=', 'entree')
         ], limit=1).heure_pointage
         #Heure Sortie pause
         pointage_sortie_pause_time = self.env["pointage.manuel"] \
@@ -265,7 +283,7 @@ class OwatransPresence(models.Model):
         ], limit=1).heure_pointage
 
         return {
-            'arrivee': pointage_arrivee_time,
+            'entree': pointage_entree_time,
             'sortie_pause': pointage_sortie_pause_time,
             'retour_pause': pointage_retour_pause_time,
             'sortie': pointage_sortie_time,
@@ -281,7 +299,7 @@ class OwatransPresence(models.Model):
         A utiliser pour charger des données de test (Pointage manuel semaine precedente)
         """
 
-        liste_heure_arrivee = ['07:30:00', '08:00:00', '08:15:00', '08:30:00', '08:50:00', '09:00:00', '09:15:00', '09:30:00']
+        liste_heure_entree = ['07:30:00', '08:00:00', '08:15:00', '08:30:00', '08:50:00', '09:00:00', '09:15:00', '09:30:00']
         liste_heure_sortie_pause = ['13:00:00', '13:05:00', '13:15:00', '13:30:00', '13:50:00', '13:45:00', '13:59:00', '13:55:00']
         liste_heure_retour_pause = ['14:00:00', '14:05:00', '14:15:00', '14:30:00', '14:50:00', '15:00:00', '15:15:00', '15:30:00']
         liste_heure_sortie = ['17:30:00', '18:00:00', '18:30:00', '18:45:00', '18:50:00', '19:00:00', '19:30:00', '20:30:00']
@@ -297,14 +315,14 @@ class OwatransPresence(models.Model):
         for employee in all_employees:
                 date_from_employee = date_from
                 while date_from_employee <= date_to:
-                    date_from_point_arrivee = str(date_from_employee).split(' ')[0] + ' ' + liste_heure_arrivee[randint(0, len(liste_heure_arrivee)-1)]
+                    date_from_point_entree = str(date_from_employee).split(' ')[0] + ' ' + liste_heure_entree[randint(0, len(liste_heure_entree)-1)]
                     date_from_point_sortie_pause = str(date_from_employee).split(' ')[0] + ' ' + liste_heure_sortie_pause[randint(0, len(liste_heure_sortie_pause)-1)]
                     date_from_point_retour_pause = str(date_from_employee).split(' ')[0] + ' ' + liste_heure_retour_pause[randint(0, len(liste_heure_retour_pause)-1)]
                     date_from_point_sortie = str(date_from_employee).split(' ')[0] + ' ' + liste_heure_sortie[randint(0, len(liste_heure_sortie)-1)]
                     self.env['pointage.manuel'].create({
                                                     'employee': employee.id,
-                                                    'type_pointage': 'arrivee',
-                                                    'date_heure': date_from_point_arrivee,
+                                                    'type_pointage': 'entree',
+                                                    'date_heure': date_from_point_entree,
                                                 })
                     self.env['pointage.manuel'].create({
                                                     'employee': employee.id,
@@ -358,9 +376,9 @@ class OwatransPresence(models.Model):
         message +=          '</tr>'
         
         message +=          '<tr>'
-        message +=            '<td class="cell">Arrivée</td>'
+        message +=            '<td class="cell">Entrée</td>'
         for i in range(len(horaire)):
-            message +=        '<td class="cell">'+ str(pointage_employee[i]['arrivee']) +'</td>'
+            message +=        '<td class="cell">'+ str(pointage_employee[i]['entree']) +'</td>'
         message +=          '</tr>'
 
         message +=          '<tr>'

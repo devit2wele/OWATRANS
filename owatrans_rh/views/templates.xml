@@ -358,6 +358,20 @@
         <field name="model">owatrans.presence</field>
         <field name="arch" type="xml">
             <form string="Presence">
+                <header>
+                    <button 
+                        string="Envoyer Presence"
+                        name="action_send_presence" 
+                        type="object"
+                        class="oe_highlight"
+                    />
+                    <button 
+                        string="Imprimer Presence"
+                        name="action_print_presence" 
+                        type="object"
+                        class="oe_highlight"
+                    />
+                </header>
                 <sheet>
                     <group>
                         <field name="current_user" invisible="1"/>
