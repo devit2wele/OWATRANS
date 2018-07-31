@@ -13,6 +13,7 @@ TYPE_CONTAINER = [
 ]
 
 
+
 STATES = [
     ('draft', 'Brouillon'),
     ('confirmer', 'Confirmé'),
