@@ -3,8 +3,11 @@
     <template id="owatrans_rh.report_presence_document">
         <t t-call="report.external_layout">
             <div class="page">
-                        <h2 style="text-align:center;color:#581112;">Fiche récaputilative des pointages</h2>
-                        <h4 style="text-align:center;color:#581112;">Allant de la date du <span t-field="o.date_from"/> au <span t-field="o.date_to"/></h4>
+                <div class="row mt32 mb32" style="margin-top: 0 px !important;margin-bottom: 0 px !important;">
+                    <img class="col-xs-2" style="margin-top: 0 px !important;margin-bottom: 0 px !important;" src='/owatrans_rh/static/description/icon.png'/>
+                </div>
+                <h2 style="text-align:center;color:#581112;">Fiche récaputilative des pointages</h2>
+                <h4 style="text-align:center;color:#581112;">Allant de la date du <span t-field="o.date_from"/> au <span t-field="o.date_to"/></h4>
                 <div class="">
                     <div>
                         <strong style="color:#581112;">Employé: </strong><span t-esc="o.employee.name"/>
