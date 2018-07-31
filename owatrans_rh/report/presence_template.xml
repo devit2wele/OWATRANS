@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <template id="owatrans_rh.report_presence_document">
-        <t t-call="report.external_layout">
+        <t>
             <div class="page">
                 <div class="row mt32 mb32" style="margin-top: 0 px !important;margin-bottom: 0 px !important;">
                     <img class="col-xs-2" style="margin-top: 0 px !important;margin-bottom: 0 px !important;" src='/owatrans_rh/static/description/icon.png'/>
