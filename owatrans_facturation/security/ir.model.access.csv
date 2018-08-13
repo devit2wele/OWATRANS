@@ -4,4 +4,5 @@ access_owatrans_zone_line,access_owatrans_zone_line,model_owatrans_zone_line,,1,
 access_transport_order,access_transport_order,model_transport_order,,1,1,1,1
 access_transport_order_line,access_transport_order_line,model_transport_order_line,,1,1,1,1
 access_type_produit,access_type_produit,model_type_produit,,1,1,1,1
+access_owatrans_francise,access_owatrans_francise,model_owatrans_francise,base.group_user,1,1,1,1
 

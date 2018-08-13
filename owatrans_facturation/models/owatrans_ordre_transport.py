@@ -28,6 +28,12 @@ NOTIFICATION = [
     ('sent_to', 'TO Envoyé'),
 ]
 
+TYPE = [
+    ('positionnement', 'POSITIONNEMENT'),
+    ('type2', 'TYPE 2'),
+    ('type3', 'TYPE 3'),
+]
+
 # ---------------------------------------------------------
 # Zone
 # ---------------------------------------------------------
@@ -35,6 +41,13 @@ class OwatransZone(models.Model):
     _name = "owatrans.zone"
     _description = "Zone"
 
+    @api.depends('price_ht_20','price_ht_40')
+    def compute_price_ttc(self):
+        for rec in self:
+            if rec.price_ht_20:
+                rec.price_ttc_20 = rec.price_ht_20 * 1.18
+            if rec.price_ht_40:
+                rec.price_ttc_40 = rec.price_ht_40 * 1.18
 
     name = fields.Char(string='Destination', required=True)
     distance = fields.Integer(string='Kilométrage', required=True)
@@ -45,8 +58,8 @@ class OwatransZone(models.Model):
 
     price_ht_20 = fields.Monetary(string='Montant HT', required=True)
     price_ht_40 = fields.Monetary(string='Montant HT', required=True)
-    price_ttc_20 = fields.Monetary(string='Montant TTC', required=True)
-    price_ttc_40 = fields.Monetary(string='Montant TTC', required=True)
+    price_ttc_20 = fields.Monetary(string='Montant TTC', required=True, compute='compute_price_ttc')
+    price_ttc_40 = fields.Monetary(string='Montant TTC', required=True, compute='compute_price_ttc')
 
     zone_line = fields.One2many('owatrans.zone.line', 'zone_id', string='Zone Line', readonly=True, store=True)
 
@@ -141,6 +154,7 @@ class TransportOrder(models.Model):
                 
 
     name = fields.Char(string='Connaissement', required=True)
+    type = fields.Selection(TYPE, string='Type')
     partner_id = fields.Many2one('res.partner', string='Client', required=True)
     origin = fields.Char(string="Origine")
     date = fields.Date(string="Date")
@@ -233,7 +247,9 @@ class TransportOrder(models.Model):
     def action_print_rq(self):
         self.write({'notification': "print"})
         return self.env['report'].get_action(self, 'owatrans_facturation.report_transportquotation')
-        #return self.env['report'].get_action(self, 'owatrans_facturation.report_transporttest')
+    @api.multi
+    def action_print_to(self):
+        return self.env['report'].get_action(self, 'owatrans_facturation.report_transportorder')
     
     @api.multi
     def action_sent_to(self):

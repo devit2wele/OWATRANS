@@ -46,11 +46,11 @@
                             </group>
                             <group string="20'">
                                 <field name="price_ht_20"/>
-                                <field name="price_ttc_20"/>
+                                <field name="price_ttc_20" readonly='1'/>
                             </group>
                             <group string="40'">
                                 <field name="price_ht_40"/>
-                                <field name="price_ttc_40"/>
+                                <field name="price_ttc_40" readonly='1'/>
                             </group>
                         </group>
                         <notebook>
@@ -207,6 +207,14 @@
                         />
 
                         <button 
+                            string="Imprimer l'ordre de transport"
+                            name="action_print_to" 
+                            type="object"
+                            class="oe_highlight"
+                            attrs="{'invisible':[('state','not in',['confirmer'])]}"
+                        />
+
+                        <button 
                             string="Annuler"
                             name="action_annuler" 
                             type="object"
@@ -221,6 +229,7 @@
                             <group>
                                 <field name="name"/>
                                 <field name="partner_id" domain="[('customer','=',True)]" />
+                                <field name="type" />
                             </group>
                             <group>
                                 <field name="origin"/>
@@ -272,6 +281,68 @@
             </field>
         </record>
 
+        <!-- Francise menu -->
+        <record id="action_owatrans_fiche_francise" model="ir.actions.act_window">
+            <field name="name">Fiche Francise</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">owatrans.francise</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="context">{"search_default_filter_to_purchase":1}</field>
+            <field name="search_view_id" eval="False"/> <!-- Force empty -->
+            <field name="view_id" eval="False"/> <!-- Force empty -->
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                Click to define a new Francise.
+              </p>
+            </field>
+        </record>
+
+        <!-- Francise form -->
+        <record id="owatrans_fiche_francise_form" model="ir.ui.view">
+            <field name="name">owatrans.francise.form</field>
+            <field name="model">owatrans.francise</field>
+            <field name="arch" type="xml">
+                <form string="Fiche Francise">
+                    <sheet>
+                        <group>
+                            <group string='Client et Agent'>
+                                <field name="client_id"/>
+                                <field name="agent_id"/>
+                            </group>
+                            <group string='Numéro'>
+                                <field name="numero_tc"/>
+                                <field name="numero_compagnie"/>
+                                <field name="numero_conteneur"/>
+                            </group>
+                            <group string='Date'>
+                                <field name="date_entree"/>
+                                <field name="date_sortie"/>
+                            </group>
+                            <group string="Véhicule">
+                                <field name="vehicule"/>
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="owatrans_fiche_francise_tree" model="ir.ui.view">
+            <field name="name">owatrans.francise.tree</field>
+            <field name="model">owatrans.francise</field>
+            <field name="arch" type="xml">
+                <tree string="Fiche Francise">
+                    <field name="vehicule"/>
+                    <field name="numero_conteneur"/>
+                    <field name="client_id"/>
+                    <field name="agent_id"/>
+                    <field name="date_entree"/>
+                    <field name="date_sortie"/> 
+                </tree>
+            </field>
+        </record>
+
        
 
         
@@ -289,6 +360,14 @@
             parent="menu_owatrans_logistique_transport"
             action="action_owatrans_transport_order" 
             sequence="2"
+        />
+
+        <menuitem 
+            id="menu_fiche_francise" 
+            name="Fiche Francise"
+            parent="menu_owatrans_logistique_transport"
+            action="action_owatrans_fiche_francise" 
+            sequence="3"
         />
 
         <!--Configuration menu-->

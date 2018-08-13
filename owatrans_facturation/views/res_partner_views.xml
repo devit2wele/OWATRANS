@@ -1,0 +1,15 @@
+<odoo>
+	
+	<record id="partner_owatrans_form_view" model="ir.ui.view">
+	    <field name="name">partner_owatrans_form_view</field>
+	    <field name="model">res.partner</field>
+	    <field name="inherit_id" ref="base.view_partner_form"/>
+	    <field name="arch" type="xml">
+	        <xpath expr="//field[@name='category_id']" position="after">
+	            <field name="cni" />
+	            <field name="code_swift" />
+	        </xpath>
+	    </field>
+	</record>
+
+</odoo>
