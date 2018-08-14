@@ -95,9 +95,16 @@
                 </tbody>
             </table>
             <div class="row mt32 mb32" style="margin-top: 0 px !important;margin-bottom: 0 px !important;margin-right: 0.2% !important;margin-left: 0.2% !important;border:1px solid;">
-                <span class="col-xs-10 mt32 mb32" style="margin-top: 0 px !important;margin-bottom: 0 px !important;">
-                    MONTANT HORS TAXE
-                </span>
+                <t t-if="o.is_with_taxe()">
+                    <span class="col-xs-10 mt32 mb32" style="margin-top: 0 px !important;margin-bottom: 0 px !important;">
+                        MONTANT TOUTES TAXES COMPRISES
+                    </span>
+                </t>
+                <t t-else="">
+                    <span class="col-xs-10 mt32 mb32" style="margin-top: 0 px !important;margin-bottom: 0 px !important;">
+                        MONTANT HORS TAXES
+                    </span>
+                </t>
                 <div class="col-xs-2 mt32 mb32" style="margin-top: 0 px !important;margin-bottom: 0 px !important;text-align:right;margin-left:-0.4% !important;">
                     <span t-field="o.amount_total"
                                     t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>

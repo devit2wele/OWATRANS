@@ -30,8 +30,8 @@ NOTIFICATION = [
 
 TYPE = [
     ('positionnement', 'POSITIONNEMENT'),
-    ('type2', 'TYPE 2'),
-    ('type3', 'TYPE 3'),
+    ('import', 'IMPORT'),
+    ('transport', 'TRANSPORT'),
 ]
 
 # ---------------------------------------------------------
@@ -154,7 +154,7 @@ class TransportOrder(models.Model):
                 
 
     name = fields.Char(string='Connaissement', required=True)
-    type = fields.Selection(TYPE, string='Type')
+    type = fields.Selection(TYPE, string='Type', required=True)
     partner_id = fields.Many2one('res.partner', string='Client', required=True)
     origin = fields.Char(string="Origine")
     date = fields.Date(string="Date")
@@ -256,18 +256,30 @@ class TransportOrder(models.Model):
         self.notification = 'sent_to'
         return self.action_send_rq()
 
+    @api.multi
+    def is_with_taxe(self):
+        if self.type == 'positionnement':
+            return False
+        return True
+
 class TransportOrderLine(models.Model):
     _name = "transport.order.line"
     _description = "Transport Order Line"
 
-    @api.depends('zone_sempos', 'type_container')
+    @api.depends('zone_sempos', 'type_container', 'order_id.type')
     def _compute_amount(self):
         for res in self:
-            if res.zone_sempos and res.type_container:
-                if res.type_container == 'type_20':
-                    res.price_total = res.zone_sempos.price_ttc_20
-                if res.type_container == 'type_40':
-                    res.price_total = res.zone_sempos.price_ttc_40
+            if res.zone_sempos and res.type_container and self.mapped('order_id').type:
+                if self.mapped('order_id').type == 'positionnement':
+                    if res.type_container == 'type_20':
+                        res.price_total = res.zone_sempos.price_ht_20
+                    if res.type_container == 'type_40':
+                        res.price_total = res.zone_sempos.price_ht_40
+                else:
+                    if res.type_container == 'type_20':
+                        res.price_total = res.zone_sempos.price_ttc_20
+                    if res.type_container == 'type_40':
+                        res.price_total = res.zone_sempos.price_ttc_40
 
 
 
