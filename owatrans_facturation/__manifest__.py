@@ -9,6 +9,7 @@
         'report',
         'mail',
         'sale',
+        'owatrans_parc_automobile',
     ],
     'author': 'Aliou Samba WELE',
     'website': 'www.owatrans.com',

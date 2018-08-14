@@ -281,11 +281,11 @@
             </field>
         </record>
 
-        <!-- Francise menu -->
-        <record id="action_owatrans_fiche_francise" model="ir.actions.act_window">
-            <field name="name">Fiche Francise</field>
+        <!-- Franchise menu -->
+        <record id="action_owatrans_fiche_franchise" model="ir.actions.act_window">
+            <field name="name">Fiche franchise</field>
             <field name="type">ir.actions.act_window</field>
-            <field name="res_model">owatrans.francise</field>
+            <field name="res_model">owatrans.franchise</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
             <field name="context">{"search_default_filter_to_purchase":1}</field>
@@ -293,17 +293,17 @@
             <field name="view_id" eval="False"/> <!-- Force empty -->
             <field name="help" type="html">
               <p class="oe_view_nocontent_create">
-                Click to define a new Francise.
+                Click to define a new franchise.
               </p>
             </field>
         </record>
 
-        <!-- Francise form -->
-        <record id="owatrans_fiche_francise_form" model="ir.ui.view">
-            <field name="name">owatrans.francise.form</field>
-            <field name="model">owatrans.francise</field>
+        <!-- Franchise form -->
+        <record id="owatrans_fiche_franchise_form" model="ir.ui.view">
+            <field name="name">owatrans.franchise.form</field>
+            <field name="model">owatrans.franchise</field>
             <field name="arch" type="xml">
-                <form string="Fiche Francise">
+                <form string="Fiche franchise">
                     <sheet>
                         <group>
                             <group string='Client et Agent'>
@@ -328,11 +328,11 @@
             </field>
         </record>
 
-        <record id="owatrans_fiche_francise_tree" model="ir.ui.view">
-            <field name="name">owatrans.francise.tree</field>
-            <field name="model">owatrans.francise</field>
+        <record id="owatrans_fiche_franchise_tree" model="ir.ui.view">
+            <field name="name">owatrans.franchise.tree</field>
+            <field name="model">owatrans.franchise</field>
             <field name="arch" type="xml">
-                <tree string="Fiche Francise">
+                <tree string="Fiche franchise">
                     <field name="vehicule"/>
                     <field name="numero_conteneur"/>
                     <field name="client_id"/>
@@ -363,10 +363,10 @@
         />
 
         <menuitem 
-            id="menu_fiche_francise" 
-            name="Fiche Francise"
+            id="menu_fiche_franchise" 
+            name="Fiche franchise"
             parent="menu_owatrans_logistique_transport"
-            action="action_owatrans_fiche_francise" 
+            action="action_owatrans_fiche_franchise" 
             sequence="3"
         />
 
