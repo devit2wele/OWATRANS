@@ -1,4 +1,0 @@
-id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_alima_mission,access_alima_mission,model_alima_mission,,1,1,1,1
-access_alima_projet,access_alima_projet,model_alima_projet,,1,1,1,1
-access_alima_user_validate,access_alima_user_validate,model_alima_user_validate,,1,1,1,1
