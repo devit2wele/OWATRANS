@@ -34,6 +34,14 @@ TYPE = [
     ('transport', 'TRANSPORT'),
 ]
 
+CATEGORIE = [
+    ('dry','DRY'),
+    ('dry_high_cube', 'DRY HIGH CUBE'),
+    ('open_top', 'OPEN TOP'),
+    ('reefer', 'REEFER'),
+    ('flat_rack', 'FLAT RACK'),
+]
+
 # ---------------------------------------------------------
 # Zone
 # ---------------------------------------------------------
@@ -288,6 +296,7 @@ class TransportOrderLine(models.Model):
     zone_sempos = fields.Many2one('owatrans.zone', string='Zone Sempos', required=True)
     produit_type = fields.Many2one('type.produit', string='Type Produit', required=True)
     destination = fields.Char(string='Destination', required=True)
+    categorie = fields.Selection(CATEGORIE, string='Catégorie')
 
     currency_id = fields.Many2one('res.currency', 'Currency', required=True,\
         default=lambda self: self.env.user.company_id.currency_id.id)
