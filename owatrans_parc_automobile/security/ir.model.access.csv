@@ -1,5 +1,4 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_owatrans_parc_automobile,access_owatrans_parc_automobile,model_owatrans_parc_automobile,,1,1,1,1
 access_owatrans_type_macaron,access_owatrans_type_macaron,model_owatrans_type_macaron,,1,1,1,1
 access_owatrans_macaron,access_owatrans_macaron,model_owatrans_macaron,,1,1,1,1
 access_fleet_vehicle,access_fleet_vehicle,model_fleet_vehicle,,1,1,1,1
