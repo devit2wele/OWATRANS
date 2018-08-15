@@ -6,8 +6,16 @@
 	    <field name="inherit_id" ref="base.view_partner_form"/>
 	    <field name="arch" type="xml">
 	        <xpath expr="//field[@name='category_id']" position="after">
-	            <field name="cni" />
-	            <field name="code_swift" />
+	            <field name="cni"  attrs="{'invisible': [('is_company','=', True)]}"/>
+	            <field name="code_swift"  attrs="{'invisible': [('is_company','!=', True)]}"/>
+	        </xpath>
+	        <xpath expr="//page[@name='sales_purchases']" position="attributes">
+                <attribute name='string'>Vente, Achat &amp; Agent</attribute> 
+            </xpath>
+	        <xpath expr="//page/group/group[@name='purchase']" position="after">
+	            <group string="Agent" >
+                    <field name="agent"/>
+                </group>
 	        </xpath>
 	    </field>
 	</record>

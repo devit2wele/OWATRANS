@@ -82,7 +82,7 @@
                             <span style="float: right;" t-field="order_line.type_container"/>
                         </td>
                         <td>
-                            <span style="float: right;">TEST</span>
+                            <span style="float: right;" t-field="order_line.categorie"/>
                         </td>
                         <td>
                             <span style="float: right;" t-field="order_line.zone_sempos"/>

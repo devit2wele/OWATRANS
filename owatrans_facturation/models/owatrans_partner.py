@@ -18,3 +18,4 @@ class Partner(models.Model):
 
     code_swift = fields.Char(string="Adresse SWIFT")
     cni = fields.Char(string="Numéro CNI")
+    agent = fields.Boolean(string='Is a agent', help="Check this box if this contact is a agent. ")

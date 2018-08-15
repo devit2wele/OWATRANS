@@ -7,12 +7,13 @@ from odoo import api, fields, models, _
 from odoo.tools import ustr
 from odoo.exceptions import UserError
 
+
+
+
 TYPE_CONTAINER = [
     ("type_20", "20'"),
     ("type_40", "40'"),
 ]
-
-
 
 STATES = [
     ('draft', 'Brouillon'),
@@ -32,6 +33,14 @@ TYPE = [
     ('positionnement', 'POSITIONNEMENT'),
     ('import', 'IMPORT'),
     ('transport', 'TRANSPORT'),
+]
+
+CATEGORIE = [
+    ('dry','DRY'),
+    ('dry_high_cube', 'DRY HIGH CUBE'),
+    ('open_top', 'OPEN TOP'),
+    ('reefer', 'REEFER'),
+    ('flat_rack', 'FLAT RACK'),
 ]
 
 # ---------------------------------------------------------
@@ -105,6 +114,16 @@ class OwatransZoneLine(models.Model):
     _name = "owatrans.zone.line"
     _description = "Zone Line"
 
+    @api.multi
+    @api.depends('zone_line')
+    def compute_numero_rdv(self):
+        for zone in self.mapped('zone_id'):
+            number = 1
+            for line in zone.zone_line:
+                line.sequence =  str(number)
+                number += 1
+
+
     sequence = fields.Char(readonly=True)
     currency_id = fields.Many2one('res.currency', 'Currency', required=True,\
         default=lambda self: self.env.user.company_id.currency_id.id)
@@ -117,14 +136,6 @@ class OwatransZoneLine(models.Model):
 
     zone_id = fields.Many2one('owatrans.zone', string='Zone')
     
-    @api.multi
-    @api.depends('zone_line')
-    def compute_numero_rdv(self):
-        for zone in self.mapped('zone_id'):
-            number = 1
-            for line in zone.zone_line:
-                line.sequence =  str(number)
-                number += 1
 
     @api.model
     @api.returns('self', lambda value: value.id)
@@ -282,12 +293,12 @@ class TransportOrderLine(models.Model):
                         res.price_total = res.zone_sempos.price_ttc_40
 
 
-
     numero = fields.Char(string="Numéro", required=True)
     type_container = fields.Selection(TYPE_CONTAINER)
     zone_sempos = fields.Many2one('owatrans.zone', string='Zone Sempos', required=True)
     produit_type = fields.Many2one('type.produit', string='Type Produit', required=True)
     destination = fields.Char(string='Destination', required=True)
+    categorie = fields.Selection(CATEGORIE, string='Catégorie')
 
     currency_id = fields.Many2one('res.currency', 'Currency', required=True,\
         default=lambda self: self.env.user.company_id.currency_id.id)
