@@ -7,12 +7,13 @@ from odoo import api, fields, models, _
 from odoo.tools import ustr
 from odoo.exceptions import UserError
 
+
+
+
 TYPE_CONTAINER = [
     ("type_20", "20'"),
     ("type_40", "40'"),
 ]
-
-
 
 STATES = [
     ('draft', 'Brouillon'),
@@ -113,6 +114,16 @@ class OwatransZoneLine(models.Model):
     _name = "owatrans.zone.line"
     _description = "Zone Line"
 
+    @api.multi
+    @api.depends('zone_line')
+    def compute_numero_rdv(self):
+        for zone in self.mapped('zone_id'):
+            number = 1
+            for line in zone.zone_line:
+                line.sequence =  str(number)
+                number += 1
+
+
     sequence = fields.Char(readonly=True)
     currency_id = fields.Many2one('res.currency', 'Currency', required=True,\
         default=lambda self: self.env.user.company_id.currency_id.id)
@@ -125,14 +136,6 @@ class OwatransZoneLine(models.Model):
 
     zone_id = fields.Many2one('owatrans.zone', string='Zone')
     
-    @api.multi
-    @api.depends('zone_line')
-    def compute_numero_rdv(self):
-        for zone in self.mapped('zone_id'):
-            number = 1
-            for line in zone.zone_line:
-                line.sequence =  str(number)
-                number += 1
 
     @api.model
     @api.returns('self', lambda value: value.id)
@@ -288,7 +291,6 @@ class TransportOrderLine(models.Model):
                         res.price_total = res.zone_sempos.price_ttc_20
                     if res.type_container == 'type_40':
                         res.price_total = res.zone_sempos.price_ttc_40
-
 
 
     numero = fields.Char(string="Numéro", required=True)
