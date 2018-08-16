@@ -17,7 +17,7 @@
 
             <div class="row mt32 mb32" style="margin-top: 0 px !important;margin-bottom: 0 px !important;">
                 <div class="col-xs-4" style="margin-top: 0 px !important;margin-bottom: 0 px !important;">
-                    <span style="border-bottom: 1 px solid;">PERIODE DU 27 au 05 MARS 2018</span>
+                    <!-- <span style="border-bottom: 1 px solid;">PERIODE DU 27 au 05 MARS 2018</span> -->
                 </div>
                 <div class="col-xs-4" style="margin-top: 0 px !important;margin-bottom: 0 px !important;">
                     <h3 style="color:#0D355C !important;">DEMANDE DE PRIX</h3>
@@ -32,7 +32,10 @@
                 <div class="col-xs-6">
                 </div>
                 <div class="col-xs-5 col-xs-offset-1" style="border: 1 px solid;height: 50px !important;padding-top:2%;padding-bottom:3%;text-align:center;">
-                    <span>MAERSK LINE SENEGAL, DAKAR</span>
+                    <span t-field="o.partner_id.parent_id.name"/>
+                    <span t-field="o.partner_id.parent_id.country_id"/><br/>
+                    <span t-field="o.partner_id.name"/>
+                    <span t-field="o.partner_id.cni"/>
                 </div>
             </div>
 
@@ -45,10 +48,11 @@
                 </div>
             </div>
             <div class="row mt32 mb32" style="margin-top: 0 px !important;margin-bottom: 0 px !important;margin-right: 0.2% !important;margin-left: 0.2% !important;border:1px solid;">
-                <span>ADRESSE SWIFT SGSNSNDA</span>
+                <span>ADRESSE SWIFT</span>
+                <span t-field="o.partner_id.parent_id.code_swift"/>
             </div>
             <div class="row mt32 mb32" style="margin-top: 0 px !important;margin-bottom: 0 px !important;margin-right: 0.2% !important;margin-left: 0.2% !important;border:1px solid;">
-                <span>POSITIONNEMENT</span>
+                <span t-field="o.type"/>
             </div>
 
             <table class="table table-bordered" style="margin-bottom:0px !important;">
@@ -78,7 +82,7 @@
                             <span style="float: right;" t-field="order_line.type_container"/>
                         </td>
                         <td>
-                            <span style="float: right;">TEST</span>
+                            <span style="float: right;" t-field="order_line.categorie"/>
                         </td>
                         <td>
                             <span style="float: right;" t-field="order_line.zone_sempos"/>
@@ -90,9 +94,16 @@
                 </tbody>
             </table>
             <div class="row mt32 mb32" style="margin-top: 0 px !important;margin-bottom: 0 px !important;margin-right: 0.2% !important;margin-left: 0.2% !important;border:1px solid;">
-                <span class="col-xs-10 mt32 mb32" style="margin-top: 0 px !important;margin-bottom: 0 px !important;">
-                    MONTANT HORS TAXE
-                </span>
+                <t t-if="o.is_with_taxe()">
+                    <span class="col-xs-10 mt32 mb32" style="margin-top: 0 px !important;margin-bottom: 0 px !important;">
+                        MONTANT TOUTES TAXES COMPRISES
+                    </span>
+                </t>
+                <t t-else="">
+                    <span class="col-xs-10 mt32 mb32" style="margin-top: 0 px !important;margin-bottom: 0 px !important;">
+                        MONTANT HORS TAXES
+                    </span>
+                </t>
                 <div class="col-xs-2 mt32 mb32" style="margin-top: 0 px !important;margin-bottom: 0 px !important;text-align:right;margin-left:-0.4% !important;">
                     <span t-field="o.amount_total"
                                     t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>

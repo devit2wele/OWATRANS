@@ -9,6 +9,7 @@
         'report',
         'mail',
         'sale',
+        'owatrans_parc_automobile',
     ],
     'author': 'Aliou Samba WELE',
     'website': 'www.owatrans.com',
@@ -16,7 +17,8 @@
     'data': [
         'security/ir.model.access.csv',
         'views/owatrans_facturation_views.xml',
-        'views/res_company_view.xml',
+        'views/res_company_views.xml',
+        'views/res_partner_views.xml',
         'data/report_paperformat_data.xml',
         'report/external_layout.xml',
         'report/transport_reports.xml',

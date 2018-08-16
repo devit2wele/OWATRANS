@@ -7,12 +7,13 @@ from odoo import api, fields, models, _
 from odoo.tools import ustr
 from odoo.exceptions import UserError
 
+
+
+
 TYPE_CONTAINER = [
     ("type_20", "20'"),
     ("type_40", "40'"),
 ]
-
-
 
 STATES = [
     ('draft', 'Brouillon'),
@@ -28,6 +29,20 @@ NOTIFICATION = [
     ('sent_to', 'TO Envoyé'),
 ]
 
+TYPE = [
+    ('positionnement', 'POSITIONNEMENT'),
+    ('import', 'IMPORT'),
+    ('transport', 'TRANSPORT'),
+]
+
+CATEGORIE = [
+    ('dry','DRY'),
+    ('dry_high_cube', 'DRY HIGH CUBE'),
+    ('open_top', 'OPEN TOP'),
+    ('reefer', 'REEFER'),
+    ('flat_rack', 'FLAT RACK'),
+]
+
 # ---------------------------------------------------------
 # Zone
 # ---------------------------------------------------------
@@ -35,6 +50,13 @@ class OwatransZone(models.Model):
     _name = "owatrans.zone"
     _description = "Zone"
 
+    @api.depends('price_ht_20','price_ht_40')
+    def compute_price_ttc(self):
+        for rec in self:
+            if rec.price_ht_20:
+                rec.price_ttc_20 = rec.price_ht_20 * 1.18
+            if rec.price_ht_40:
+                rec.price_ttc_40 = rec.price_ht_40 * 1.18
 
     name = fields.Char(string='Destination', required=True)
     distance = fields.Integer(string='Kilométrage', required=True)
@@ -45,8 +67,8 @@ class OwatransZone(models.Model):
 
     price_ht_20 = fields.Monetary(string='Montant HT', required=True)
     price_ht_40 = fields.Monetary(string='Montant HT', required=True)
-    price_ttc_20 = fields.Monetary(string='Montant TTC', required=True)
-    price_ttc_40 = fields.Monetary(string='Montant TTC', required=True)
+    price_ttc_20 = fields.Monetary(string='Montant TTC', required=True, compute='compute_price_ttc')
+    price_ttc_40 = fields.Monetary(string='Montant TTC', required=True, compute='compute_price_ttc')
 
     zone_line = fields.One2many('owatrans.zone.line', 'zone_id', string='Zone Line', readonly=True, store=True)
 
@@ -92,6 +114,16 @@ class OwatransZoneLine(models.Model):
     _name = "owatrans.zone.line"
     _description = "Zone Line"
 
+    @api.multi
+    @api.depends('zone_line')
+    def compute_numero_rdv(self):
+        for zone in self.mapped('zone_id'):
+            number = 1
+            for line in zone.zone_line:
+                line.sequence =  str(number)
+                number += 1
+
+
     sequence = fields.Char(readonly=True)
     currency_id = fields.Many2one('res.currency', 'Currency', required=True,\
         default=lambda self: self.env.user.company_id.currency_id.id)
@@ -104,14 +136,6 @@ class OwatransZoneLine(models.Model):
 
     zone_id = fields.Many2one('owatrans.zone', string='Zone')
     
-    @api.multi
-    @api.depends('zone_line')
-    def compute_numero_rdv(self):
-        for zone in self.mapped('zone_id'):
-            number = 1
-            for line in zone.zone_line:
-                line.sequence =  str(number)
-                number += 1
 
     @api.model
     @api.returns('self', lambda value: value.id)
@@ -141,6 +165,7 @@ class TransportOrder(models.Model):
                 
 
     name = fields.Char(string='Connaissement', required=True)
+    type = fields.Selection(TYPE, string='Type', required=True)
     partner_id = fields.Many2one('res.partner', string='Client', required=True)
     origin = fields.Char(string="Origine")
     date = fields.Date(string="Date")
@@ -233,26 +258,39 @@ class TransportOrder(models.Model):
     def action_print_rq(self):
         self.write({'notification': "print"})
         return self.env['report'].get_action(self, 'owatrans_facturation.report_transportquotation')
-        #return self.env['report'].get_action(self, 'owatrans_facturation.report_transporttest')
+    @api.multi
+    def action_print_to(self):
+        return self.env['report'].get_action(self, 'owatrans_facturation.report_transportorder')
     
     @api.multi
     def action_sent_to(self):
         self.notification = 'sent_to'
         return self.action_send_rq()
 
+    @api.multi
+    def is_with_taxe(self):
+        if self.type == 'positionnement':
+            return False
+        return True
+
 class TransportOrderLine(models.Model):
     _name = "transport.order.line"
     _description = "Transport Order Line"
 
-    @api.depends('zone_sempos', 'type_container')
+    @api.depends('zone_sempos', 'type_container', 'order_id.type')
     def _compute_amount(self):
         for res in self:
-            if res.zone_sempos and res.type_container:
-                if res.type_container == 'type_20':
-                    res.price_total = res.zone_sempos.price_ttc_20
-                if res.type_container == 'type_40':
-                    res.price_total = res.zone_sempos.price_ttc_40
-
+            if res.zone_sempos and res.type_container and self.mapped('order_id').type:
+                if self.mapped('order_id').type == 'positionnement':
+                    if res.type_container == 'type_20':
+                        res.price_total = res.zone_sempos.price_ht_20
+                    if res.type_container == 'type_40':
+                        res.price_total = res.zone_sempos.price_ht_40
+                else:
+                    if res.type_container == 'type_20':
+                        res.price_total = res.zone_sempos.price_ttc_20
+                    if res.type_container == 'type_40':
+                        res.price_total = res.zone_sempos.price_ttc_40
 
 
     numero = fields.Char(string="Numéro", required=True)
@@ -260,6 +298,7 @@ class TransportOrderLine(models.Model):
     zone_sempos = fields.Many2one('owatrans.zone', string='Zone Sempos', required=True)
     produit_type = fields.Many2one('type.produit', string='Type Produit', required=True)
     destination = fields.Char(string='Destination', required=True)
+    categorie = fields.Selection(CATEGORIE, string='Catégorie')
 
     currency_id = fields.Many2one('res.currency', 'Currency', required=True,\
         default=lambda self: self.env.user.company_id.currency_id.id)
