@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?> 
 <odoo>
     <data>
     	<!-- <template id="external_layout_header_custom" inherit_id="report.external_layout_header">
