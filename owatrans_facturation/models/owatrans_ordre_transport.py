@@ -277,20 +277,20 @@ class TransportOrderLine(models.Model):
     _name = "transport.order.line"
     _description = "Transport Order Line"
 
-    @api.depends('zone_sempos', 'type_container', 'order_id.type')
+    @api.depends('zone_sempos', 'type_container', 'order_id.type', 'remise')
     def _compute_amount(self):
         for res in self:
             if res.zone_sempos and res.type_container and self.mapped('order_id').type:
                 if self.mapped('order_id').type == 'positionnement':
                     if res.type_container == 'type_20':
-                        res.price_total = res.zone_sempos.price_ht_20
+                        res.price_total = res.zone_sempos.price_ht_20 - res.zone_sempos.price_ht_20 * res.remise / 100
                     if res.type_container == 'type_40':
-                        res.price_total = res.zone_sempos.price_ht_40
+                        res.price_total = res.zone_sempos.price_ht_40 - res.zone_sempos.price_ht_40 * res.remise / 100
                 else:
                     if res.type_container == 'type_20':
-                        res.price_total = res.zone_sempos.price_ttc_20
+                        res.price_total = res.zone_sempos.price_ttc_20 - res.zone_sempos.price_ttc_20 * res.remise / 100
                     if res.type_container == 'type_40':
-                        res.price_total = res.zone_sempos.price_ttc_40
+                        res.price_total = res.zone_sempos.price_ttc_40 - res.zone_sempos.price_ttc_40 * res.remise / 100
 
 
     numero = fields.Char(string="Numéro", required=True)
@@ -299,6 +299,7 @@ class TransportOrderLine(models.Model):
     produit_type = fields.Many2one('type.produit', string='Type Produit', required=True)
     destination = fields.Char(string='Destination', required=True)
     categorie = fields.Selection(CATEGORIE, string='Catégorie')
+    remise = fields.Float(string='Remise(%)')
 
     currency_id = fields.Many2one('res.currency', 'Currency', required=True,\
         default=lambda self: self.env.user.company_id.currency_id.id)
